@@ -10,40 +10,33 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const STATION = import.meta.env.VITE_STATION_SHORTCODE;
 const POLL_INTERVAL = 15_000;
 
-function isGenericArt(art: string | undefined): boolean {
-  if (!art) return true;
-  return art.includes('generic') || art.includes('placeholder') || art.endsWith('/albumart');
-}
-
 async function enrichWithCoverArt(np: NowPlayingData): Promise<NowPlayingData> {
   const song = np.now_playing.song;
-  if (isGenericArt(song.art) && song.artist && song.title) {
-    const coverUrl = await fetchCoverArt(song.artist, song.title);
-    if (coverUrl) {
-      return {
-        ...np,
-        now_playing: {
-          ...np.now_playing,
-          song: { ...song, art: coverUrl },
-        },
-      };
-    }
-  }
 
-  // Also enrich history
+  // Always fetch from iTunes, ignore AzuraCast art URLs
+  const coverUrl = (song.artist && song.title)
+    ? await fetchCoverArt(song.artist, song.title)
+    : null;
+
   const enrichedHistory = await Promise.all(
     np.song_history.map(async (entry) => {
-      if (isGenericArt(entry.song.art) && entry.song.artist && entry.song.title) {
-        const coverUrl = await fetchCoverArt(entry.song.artist, entry.song.title);
-        if (coverUrl) {
-          return { ...entry, song: { ...entry.song, art: coverUrl } };
-        }
-      }
-      return entry;
+      const url = (entry.song.artist && entry.song.title)
+        ? await fetchCoverArt(entry.song.artist, entry.song.title)
+        : null;
+      return url
+        ? { ...entry, song: { ...entry.song, art: url } }
+        : { ...entry, song: { ...entry.song, art: '' } };
     })
   );
 
-  return { ...np, song_history: enrichedHistory };
+  return {
+    ...np,
+    now_playing: {
+      ...np.now_playing,
+      song: { ...song, art: coverUrl || '' },
+    },
+    song_history: enrichedHistory,
+  };
 }
 
 export function useNowPlaying() {
