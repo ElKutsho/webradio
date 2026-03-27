@@ -1,4 +1,5 @@
 import type { NowPlayingData } from '../types/nowplaying';
+import { rewriteNowPlaying } from './api';
 
 export function connectSSE(
   baseUrl: string,
@@ -19,14 +20,14 @@ export function connectSSE(
       if ('connect' in json && json.connect?.data) {
         for (const row of json.connect.data) {
           if (row?.pub?.data?.np) {
-            onUpdate(row.pub.data.np);
+            onUpdate(rewriteNowPlaying(row.pub.data.np));
           }
         }
       }
 
       // Live updates
       if ('pub' in json && json.pub?.data?.np) {
-        onUpdate(json.pub.data.np);
+        onUpdate(rewriteNowPlaying(json.pub.data.np));
       }
     } catch {
       // Ignore parse errors
