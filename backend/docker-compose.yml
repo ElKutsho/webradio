@@ -1,12 +1,23 @@
 services:
+  frontend:
+    container_name: webradio-frontend
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - azuracast
+    restart: unless-stopped
+
   azuracast:
     container_name: azuracast
-    image: "ghcr.io/azuracast/azuracast:${AZURACAST_VERSION:-latest}"
+    image: "ghcr.io/azuracast/azuracast:latest"
     ports:
-      - "${AZURACAST_HTTP_PORT:-8080}:80"
-      - "${AZURACAST_HTTPS_PORT:-8443}:443"
-      - "${AZURACAST_SFTP_PORT:-2022}:2022"
-      - "8000-8050:8000-8050"
+      - "8090:80"
+      - "8443:443"
+      - "2022:2022"
+      - "30000-30050:8000-8050"
     volumes:
       - db_data:/var/lib/mysql
       - station_data:/var/azuracast/stations

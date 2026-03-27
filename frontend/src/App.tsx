@@ -8,6 +8,8 @@ import { AudioPlayer } from './components/AudioPlayer';
 function App() {
   return (
     <PlayerProvider>
+      <div className="animated-bg" />
+      <div className="grain-overlay" />
       <Layout>
         <LiveDJIndicator />
         <NowPlaying />
