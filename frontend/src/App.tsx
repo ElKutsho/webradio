@@ -4,6 +4,7 @@ import { NowPlaying } from './components/NowPlaying';
 import { LiveDJIndicator } from './components/LiveDJIndicator';
 import { ListenerCount } from './components/ListenerCount';
 import { AudioPlayer } from './components/AudioPlayer';
+import { SongHistory } from './components/SongHistory';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <LiveDJIndicator />
         <NowPlaying />
         <ListenerCount />
+        <SongHistory />
       </Layout>
       <AudioPlayer />
     </PlayerProvider>
