@@ -1,0 +1,38 @@
+services:
+  azuracast:
+    container_name: azuracast
+    image: "ghcr.io/azuracast/azuracast:${AZURACAST_VERSION:-latest}"
+    ports:
+      - "${AZURACAST_HTTP_PORT:-8080}:80"
+      - "${AZURACAST_HTTPS_PORT:-8443}:443"
+      - "${AZURACAST_SFTP_PORT:-2022}:2022"
+      - "8000-8050:8000-8050"
+    volumes:
+      - db_data:/var/lib/mysql
+      - station_data:/var/azuracast/stations
+      - backups:/var/azuracast/backups
+      - www_uploads:/var/azuracast/uploads
+      - shoutcast2_install:/var/azuracast/servers/shoutcast2
+      - geolite_install:/var/azuracast/geoip
+      - sftpgo_data:/var/azuracast/sftpgo/persist
+      - acme:/var/azuracast/acme
+    env_file: azuracast.env
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "5"
+
+volumes:
+  db_data: {}
+  station_data: {}
+  backups: {}
+  www_uploads: {}
+  shoutcast2_install: {}
+  geolite_install: {}
+  sftpgo_data: {}
+  acme: {}
