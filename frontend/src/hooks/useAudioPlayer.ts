@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useAnnouncements } from './useAnnouncements';
 
 const VOLUME_KEY = 'kutsho-radio-volume';
 
@@ -86,6 +87,8 @@ export function useAudioPlayer(streamUrl: string | undefined) {
     }
     localStorage.setItem(VOLUME_KEY, String(clamped));
   }, []);
+
+  useAnnouncements({ audioRef, isPlaying, volume });
 
   return { isPlaying, isBuffering, volume, play, pause, toggle, setVolume };
 }
