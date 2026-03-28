@@ -56,19 +56,20 @@ export function useAudioPlayer(streamUrl: string | undefined) {
     const audio = audioRef.current;
     if (!audio || !streamUrl) return;
 
-    if (!audio.src || audio.src === '') {
-      audio.src = streamUrl;
-    }
+    // Always set the source fresh — after pause the src is removed
+    audio.src = streamUrl;
+    audio.volume = volume;
     setIsBuffering(true);
     audio.play().catch(() => setIsBuffering(false));
-  }, [streamUrl]);
+  }, [streamUrl, volume]);
 
   const pause = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
-    // Reset source to stop buffering the stream
-    audio.src = '';
+    // Remove source to stop buffering the stream
+    audio.removeAttribute('src');
+    audio.load();
   }, []);
 
   const toggle = useCallback(() => {
