@@ -87,6 +87,9 @@ export function AudioPlayer() {
             onChange={(e) => setVolume(parseFloat(e.target.value))}
             className="w-20"
             aria-label="Volume"
+            style={{
+              background: `linear-gradient(to right, #a78bfa 0%, #a78bfa ${volume * 100}%, rgba(255, 255, 255, 0.08) ${volume * 100}%, rgba(255, 255, 255, 0.08) 100%)`,
+            }}
           />
         </div>
 

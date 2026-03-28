@@ -1,8 +1,17 @@
 import { useRef, useEffect, useState } from 'react';
 import { usePlayer } from '../context/PlayerContext';
+import { useInterpolatedProgress } from '../hooks/useInterpolatedProgress';
 
 export function NowPlaying() {
   const { nowPlaying, isLoading, isPlaying } = usePlayer();
+
+  const npData = nowPlaying?.now_playing;
+  const { interpolatedElapsed, progress } = useInterpolatedProgress({
+    elapsed: npData?.elapsed ?? 0,
+    duration: npData?.duration ?? 0,
+    songId: npData?.sh_id ?? 0,
+    isPlaying,
+  });
 
   if (isLoading || !nowPlaying) {
     return (
@@ -16,8 +25,7 @@ export function NowPlaying() {
     );
   }
 
-  const { song, elapsed, duration } = nowPlaying.now_playing;
-  const progress = duration > 0 ? (elapsed / duration) * 100 : 0;
+  const { song, duration } = nowPlaying.now_playing;
 
   return (
     <div className="flex flex-col items-center gap-8 w-full fade-in-up">
@@ -87,12 +95,12 @@ export function NowPlaying() {
       <div className="w-full max-w-xs">
         <div className="h-[3px] bg-white/[0.06] rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-purple-500 via-violet-400 to-purple-400 rounded-full transition-all duration-1000 ease-linear"
+            className="h-full bg-gradient-to-r from-purple-500 via-violet-400 to-purple-400 rounded-full transition-[width] duration-300 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
         <div className="flex justify-between text-[10px] text-white/20 mt-2 font-mono tracking-wider">
-          <span>{formatTime(elapsed)}</span>
+          <span>{formatTime(interpolatedElapsed)}</span>
           <span>{formatTime(duration)}</span>
         </div>
       </div>
