@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useAnnouncements } from './useAnnouncements';
 
 const VOLUME_KEY = 'kutsho-radio-volume';
@@ -12,64 +12,46 @@ export function useAudioPlayer(streamUrl: string | undefined) {
     return saved ? parseFloat(saved) : 0.7;
   });
 
-  useEffect(() => {
+  const play = useCallback(() => {
+    if (!streamUrl) return;
+
+    // Create a fresh audio element every time to avoid stale state
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
     const audio = new Audio();
     audio.preload = 'none';
+    audio.volume = volume;
+    audio.src = streamUrl;
     audioRef.current = audio;
+
+    setIsBuffering(true);
 
     audio.addEventListener('playing', () => {
       setIsPlaying(true);
       setIsBuffering(false);
-    });
-    audio.addEventListener('pause', () => setIsPlaying(false));
-    audio.addEventListener('waiting', () => setIsBuffering(true));
-    audio.addEventListener('canplay', () => setIsBuffering(false));
+    }, { once: true });
+
     audio.addEventListener('error', () => {
       setIsPlaying(false);
       setIsBuffering(false);
+    }, { once: true });
+
+    audio.play().catch(() => {
+      setIsBuffering(false);
     });
-
-    audio.volume = volume;
-
-    return () => {
-      audio.pause();
-      audio.src = '';
-      audioRef.current = null;
-    };
-  }, []);
-
-  // Update source when stream URL changes
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !streamUrl) return;
-
-    if (audio.src !== streamUrl) {
-      const wasPlaying = isPlaying;
-      audio.src = streamUrl;
-      if (wasPlaying) {
-        audio.play().catch(() => {});
-      }
-    }
-  }, [streamUrl]);
-
-  const play = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio || !streamUrl) return;
-
-    // Always set the source fresh — after pause the src is removed
-    audio.src = streamUrl;
-    audio.volume = volume;
-    setIsBuffering(true);
-    audio.play().catch(() => setIsBuffering(false));
   }, [streamUrl, volume]);
 
   const pause = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
-    // Remove source to stop buffering the stream
-    audio.removeAttribute('src');
-    audio.load();
+    audio.src = '';
+    audioRef.current = null;
+    setIsPlaying(false);
+    setIsBuffering(false);
   }, []);
 
   const toggle = useCallback(() => {
