@@ -3,41 +3,11 @@ import type { NowPlayingData } from '../types/nowplaying';
 import { fetchNowPlaying } from '../services/api';
 import { connectSSE } from '../services/sse';
 import { subscribeMock } from '../services/mock';
-import { fetchCoverArt } from '../services/coverArt';
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const STATION = import.meta.env.VITE_STATION_SHORTCODE;
 const POLL_INTERVAL = 15_000;
-
-async function enrichWithCoverArt(np: NowPlayingData): Promise<NowPlayingData> {
-  const song = np.now_playing.song;
-
-  // Always fetch from iTunes, ignore AzuraCast art URLs
-  const coverUrl = (song.artist && song.title)
-    ? await fetchCoverArt(song.artist, song.title)
-    : null;
-
-  const enrichedHistory = await Promise.all(
-    np.song_history.map(async (entry) => {
-      const url = (entry.song.artist && entry.song.title)
-        ? await fetchCoverArt(entry.song.artist, entry.song.title)
-        : null;
-      return url
-        ? { ...entry, song: { ...entry.song, art: url } }
-        : { ...entry, song: { ...entry.song, art: '' } };
-    })
-  );
-
-  return {
-    ...np,
-    now_playing: {
-      ...np.now_playing,
-      song: { ...song, art: coverUrl || '' },
-    },
-    song_history: enrichedHistory,
-  };
-}
 
 export function useNowPlaying() {
   const [data, setData] = useState<NowPlayingData | null>(null);
@@ -48,10 +18,8 @@ export function useNowPlaying() {
   useEffect(() => {
     if (USE_MOCK) {
       const unsubscribe = subscribeMock((np) => {
-        enrichWithCoverArt(np).then((enriched) => {
-          setData(enriched);
-          setIsLoading(false);
-        });
+        setData(np);
+        setIsLoading(false);
       });
       cleanupRef.current = unsubscribe;
       return unsubscribe;
@@ -62,7 +30,6 @@ export function useNowPlaying() {
 
     // Initial fetch
     fetchNowPlaying()
-      .then((np) => enrichWithCoverArt(np))
       .then((np) => {
         if (!cancelled) {
           setData(np);
@@ -76,22 +43,19 @@ export function useNowPlaying() {
     // Try SSE connection
     try {
       const closeSSE = connectSSE(BASE_URL, STATION, (np) => {
-        enrichWithCoverArt(np).then((enriched) => {
-          if (!cancelled) {
-            setData(enriched);
-            setIsLoading(false);
-            setError(null);
-          }
-        });
+        if (!cancelled) {
+          setData(np);
+          setIsLoading(false);
+          setError(null);
+        }
       });
       cleanupRef.current = closeSSE;
     } catch {
       pollTimer = setInterval(async () => {
         try {
           const np = await fetchNowPlaying();
-          const enriched = await enrichWithCoverArt(np);
           if (!cancelled) {
-            setData(enriched);
+            setData(np);
             setError(null);
           }
         } catch (err) {
