@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { usePlayer } from '../context/PlayerContext';
 import { SchedulePopup } from './SchedulePopup';
+import logoImg from '../assets/download.webp';
 
 export function Layout({ children }: { children: ReactNode }) {
   const { nowPlaying } = usePlayer();
@@ -25,9 +26,7 @@ export function Layout({ children }: { children: ReactNode }) {
         {/* Logo / Title */}
         <div className="flex flex-col items-center gap-2">
           <div className="flex items-center gap-3">
-            <h1 className="text-white/80 text-xs font-medium tracking-[0.4em] uppercase">
-              Kutsho Radio
-            </h1>
+            <img src={logoImg} alt="Radio Kutsho" className="h-8" />
             <button
               onClick={() => setScheduleOpen(true)}
               className="text-white/50 hover:text-purple-400 transition-colors"

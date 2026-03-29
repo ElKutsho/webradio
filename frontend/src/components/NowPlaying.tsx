@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { usePlayer } from '../context/PlayerContext';
 import { useInterpolatedProgress } from '../hooks/useInterpolatedProgress';
+import vinylImg from '../assets/vynil.png';
 
 export function NowPlaying() {
   const { nowPlaying, isLoading, isPlaying } = usePlayer();
@@ -37,19 +38,8 @@ export function NowPlaying() {
             isPlaying ? 'left-[30%] opacity-100' : 'left-[10%] opacity-0'
           }`}
         >
-          <div className={`w-full h-full rounded-full border-[6px] border-zinc-800 ${isPlaying ? 'vinyl-spin' : ''}`}>
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden">
-              {/* Vinyl grooves */}
-              <div className="absolute inset-4 rounded-full border border-white/[0.03]" />
-              <div className="absolute inset-8 rounded-full border border-white/[0.03]" />
-              <div className="absolute inset-12 rounded-full border border-white/[0.03]" />
-              <div className="absolute inset-16 rounded-full border border-white/[0.03]" />
-              <div className="absolute inset-20 rounded-full border border-white/[0.03]" />
-              {/* Center label */}
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-900/60 to-zinc-800 border border-white/5 flex items-center justify-center">
-                <div className="w-3 h-3 rounded-full bg-zinc-700" />
-              </div>
-            </div>
+          <div className={`w-full h-full rounded-full border-[6px] border-zinc-800 overflow-hidden ${isPlaying ? 'vinyl-spin' : ''}`}>
+            <img src={vinylImg} alt="" className="w-full h-full rounded-full object-cover" />
           </div>
         </div>
 
