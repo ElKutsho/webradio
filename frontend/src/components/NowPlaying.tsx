@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { usePlayer } from '../context/PlayerContext';
 import { useInterpolatedProgress } from '../hooks/useInterpolatedProgress';
-import vinylImg from '../assets/vynil.png';
 
 export function NowPlaying() {
   const { nowPlaying, isLoading, isPlaying } = usePlayer();
@@ -34,12 +33,23 @@ export function NowPlaying() {
       <div className="relative group">
         {/* Vinyl record behind cover */}
         <div
-          className={`absolute top-1/2 -translate-y-1/2 w-80 h-80 md:w-96 md:h-96 rounded-full bg-zinc-900 transition-all duration-700 ease-out ${
-            isPlaying ? 'left-[25%] opacity-100' : 'left-[10%] opacity-0'
+          className={`absolute top-1/2 -translate-y-1/2 w-64 h-64 md:w-72 md:h-72 rounded-full bg-zinc-900 transition-all duration-700 ease-out ${
+            isPlaying ? 'left-[30%] opacity-100' : 'left-[10%] opacity-0'
           }`}
         >
-          <div className={`w-full h-full rounded-full border-[6px] border-zinc-800 overflow-hidden ${isPlaying ? 'vinyl-spin' : ''}`}>
-            <img src={vinylImg} alt="" className="w-full h-full rounded-full object-cover" />
+          <div className={`w-full h-full rounded-full border-[6px] border-zinc-800 ${isPlaying ? 'vinyl-spin' : ''}`}>
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden">
+              {/* Vinyl grooves */}
+              <div className="absolute inset-4 rounded-full border border-white/[0.03]" />
+              <div className="absolute inset-8 rounded-full border border-white/[0.03]" />
+              <div className="absolute inset-12 rounded-full border border-white/[0.03]" />
+              <div className="absolute inset-16 rounded-full border border-white/[0.03]" />
+              <div className="absolute inset-20 rounded-full border border-white/[0.03]" />
+              {/* Center label */}
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-zinc-700/60 to-zinc-800 border border-white/5 flex items-center justify-center" style={{ background: `linear-gradient(135deg, var(--accent, #7c3aed)33, #27272a)` }}>
+                <div className="w-3 h-3 rounded-full bg-zinc-700" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -63,11 +73,11 @@ export function NowPlaying() {
         {/* Equalizer indicator */}
         {isPlaying && (
           <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-end gap-[3px] h-5">
-            <span className="w-[3px] bg-purple-400 rounded-full eq-bar" style={{ animationDelay: '0ms' }} />
-            <span className="w-[3px] bg-purple-400 rounded-full eq-bar" style={{ animationDelay: '200ms' }} />
-            <span className="w-[3px] bg-purple-400 rounded-full eq-bar" style={{ animationDelay: '400ms' }} />
-            <span className="w-[3px] bg-purple-400 rounded-full eq-bar" style={{ animationDelay: '150ms' }} />
-            <span className="w-[3px] bg-purple-400 rounded-full eq-bar" style={{ animationDelay: '350ms' }} />
+            <span className="w-[3px] rounded-full eq-bar" style={{ animationDelay: '0ms', backgroundColor: 'var(--accent, #a78bfa)' }} />
+            <span className="w-[3px] rounded-full eq-bar" style={{ animationDelay: '200ms', backgroundColor: 'var(--accent, #a78bfa)' }} />
+            <span className="w-[3px] rounded-full eq-bar" style={{ animationDelay: '400ms', backgroundColor: 'var(--accent, #a78bfa)' }} />
+            <span className="w-[3px] rounded-full eq-bar" style={{ animationDelay: '150ms', backgroundColor: 'var(--accent, #a78bfa)' }} />
+            <span className="w-[3px] rounded-full eq-bar" style={{ animationDelay: '350ms', backgroundColor: 'var(--accent, #a78bfa)' }} />
           </div>
         )}
       </div>
@@ -85,8 +95,8 @@ export function NowPlaying() {
       <div className="w-full max-w-xs">
         <div className="h-[3px] bg-white/[0.06] rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-purple-500 via-violet-400 to-purple-400 rounded-full transition-[width] duration-300 ease-linear"
-            style={{ width: `${progress}%` }}
+            className="h-full rounded-full transition-[width] duration-300 ease-linear"
+            style={{ width: `${progress}%`, background: `linear-gradient(to right, var(--accent, #8b5cf6), var(--accent-light, #a78bfa))` }}
           />
         </div>
         <div className="flex justify-between text-[10px] text-white/20 mt-2 font-mono tracking-wider">
