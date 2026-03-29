@@ -165,6 +165,16 @@ input[type="range"]::-moz-range-thumb {
   animation: eq-bar 0.8s ease-in-out infinite;
 }
 
+/* Live badge glow */
+.live-badge {
+  animation: live-glow 2s ease-in-out infinite;
+}
+
+@keyframes live-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.2); }
+  50% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.4); }
+}
+
 /* Fade in animation */
 @keyframes fade-in-up {
   from {

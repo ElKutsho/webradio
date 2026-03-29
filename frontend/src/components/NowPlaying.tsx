@@ -34,8 +34,8 @@ export function NowPlaying() {
       <div className="relative group">
         {/* Vinyl record behind cover */}
         <div
-          className={`absolute top-1/2 -translate-y-1/2 w-64 h-64 md:w-72 md:h-72 rounded-full bg-zinc-900 transition-all duration-700 ease-out ${
-            isPlaying ? 'left-[30%] opacity-100' : 'left-[10%] opacity-0'
+          className={`absolute top-1/2 -translate-y-1/2 w-80 h-80 md:w-96 md:h-96 rounded-full bg-zinc-900 transition-all duration-700 ease-out ${
+            isPlaying ? 'left-[25%] opacity-100' : 'left-[10%] opacity-0'
           }`}
         >
           <div className={`w-full h-full rounded-full border-[6px] border-zinc-800 overflow-hidden ${isPlaying ? 'vinyl-spin' : ''}`}>
