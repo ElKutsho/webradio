@@ -24,18 +24,7 @@ function rewriteNowPlaying(data: NowPlayingData): NowPlayingData {
       listen_url: rewriteUrl(data.station.listen_url),
       mounts: data.station.mounts.map((m) => ({ ...m, url: rewriteUrl(m.url) })),
     },
-    now_playing: {
-      ...data.now_playing,
-      song: { ...data.now_playing.song, art: rewriteUrl(data.now_playing.song.art) },
-    },
-    live: {
-      ...data.live,
-      art: data.live.art ? rewriteUrl(data.live.art) : null,
-    },
-    song_history: data.song_history.map((entry) => ({
-      ...entry,
-      song: { ...entry.song, art: rewriteUrl(entry.song.art) },
-    })),
+    // Keep art URLs as absolute - they point directly to AzuraCast
   };
 }
 
