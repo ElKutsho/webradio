@@ -26,13 +26,9 @@ export function useAudioPlayer(streamUrl: string | undefined) {
     }
   }, [audioDevices.selectedDeviceId]);
 
-  const play = useCallback(() => {
+  const playLocal = useCallback(() => {
     if (!streamUrl) return;
 
-    // If playing on Sonos, don't use local audio
-    if (sonos.activeZone) return;
-
-    // Create a fresh audio element every time to avoid stale state
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -42,7 +38,6 @@ export function useAudioPlayer(streamUrl: string | undefined) {
     audio.preload = 'none';
     audio.volume = volume;
 
-    // Apply output device
     if ('setSinkId' in audio && typeof (audio as any).setSinkId === 'function') {
       (audio as any).setSinkId(audioDevices.selectedDeviceId).catch(() => {});
     }
@@ -65,7 +60,31 @@ export function useAudioPlayer(streamUrl: string | undefined) {
     audio.play().catch(() => {
       setIsBuffering(false);
     });
-  }, [streamUrl, volume, sonos.activeZone, audioDevices.selectedDeviceId]);
+  }, [streamUrl, volume, audioDevices.selectedDeviceId]);
+
+  const playSonos = useCallback((zoneName: string) => {
+    if (!streamUrl) return;
+
+    const absoluteUrl = streamUrl.startsWith('http')
+      ? streamUrl
+      : `${window.location.origin}${streamUrl}`;
+
+    sonos.playOnSonos(zoneName, absoluteUrl);
+    setIsPlaying(true);
+    setIsBuffering(false);
+  }, [streamUrl, sonos]);
+
+  const play = useCallback(() => {
+    if (!streamUrl) return;
+
+    // If Sonos is active, play on Sonos
+    if (sonos.activeZone) {
+      playSonos(sonos.activeZone);
+      return;
+    }
+
+    playLocal();
+  }, [streamUrl, sonos.activeZone, playLocal, playSonos]);
 
   const pause = useCallback(() => {
     // If Sonos is active, pause on Sonos
@@ -153,15 +172,8 @@ export function useAudioPlayer(streamUrl: string | undefined) {
       audioRef.current = null;
     }
 
-    // Build absolute stream URL for Sonos
-    const absoluteUrl = streamUrl.startsWith('http')
-      ? streamUrl
-      : `${window.location.origin}${streamUrl}`;
-
-    sonos.playOnSonos(zoneName, absoluteUrl);
-    setIsPlaying(true);
-    setIsBuffering(false);
-  }, [streamUrl, sonos]);
+    playSonos(zoneName);
+  }, [streamUrl, playSonos]);
 
   useAnnouncements({ audioRef, isPlaying, volume });
 
