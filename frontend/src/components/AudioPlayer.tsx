@@ -1,10 +1,16 @@
 import { useState } from 'react';
 import { usePlayer } from '../context/PlayerContext';
 import { SchedulePopup } from './SchedulePopup';
+import { DeviceSelector } from './DeviceSelector';
 
 export function AudioPlayer() {
-  const { isPlaying, isBuffering, volume, toggle, setVolume, nowPlaying } = usePlayer();
+  const {
+    isPlaying, isBuffering, volume, toggle, setVolume, nowPlaying,
+    browserDevices, selectedDeviceId, sonosZones, sonosAvailable, sonosDiscovering,
+    activeSonosZone, selectBrowserDevice, selectSonosZone, refreshSonos,
+  } = usePlayer();
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [deviceOpen, setDeviceOpen] = useState(false);
 
   if (!nowPlaying) return null;
 
@@ -37,6 +43,48 @@ export function AudioPlayer() {
                 {nowPlaying.now_playing.song.artist}
               </div>
             </div>
+          </div>
+
+          {/* Device selector button */}
+          <div className="relative flex-shrink-0">
+            <button
+              onClick={() => setDeviceOpen(!deviceOpen)}
+              className={`transition-colors ${
+                activeSonosZone
+                  ? 'text-[var(--accent,#8b5cf6)]'
+                  : 'text-white/30 hover:text-white/60'
+              }`}
+              aria-label="Ausgabegerät wählen"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38a.75.75 0 0 1-1.006-.327 11.002 11.002 0 0 1-.968-3.326m.968-6.042a10.93 10.93 0 0 1-.968-3.325.75.75 0 0 1 1.006-.327l.657.38c.523.301.71.96.463 1.51-.4.892-.732 1.822-.985 2.784Zm5.384-4.523A9 9 0 0 1 17.25 12a9 9 0 0 1-1.526 4.523M20.515 6.343a12 12 0 0 1 0 11.314" />
+              </svg>
+              {activeSonosZone && (
+                <div
+                  className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
+                  style={{ backgroundColor: 'var(--accent, #8b5cf6)' }}
+                />
+              )}
+            </button>
+            <DeviceSelector
+              isOpen={deviceOpen}
+              onClose={() => setDeviceOpen(false)}
+              browserDevices={browserDevices}
+              sonosZones={sonosZones}
+              sonosAvailable={sonosAvailable}
+              sonosDiscovering={sonosDiscovering}
+              selectedDeviceId={selectedDeviceId}
+              activeSonosZone={activeSonosZone}
+              onSelectBrowserDevice={(id) => {
+                selectBrowserDevice(id);
+                setDeviceOpen(false);
+              }}
+              onSelectSonos={(name) => {
+                selectSonosZone(name);
+                setDeviceOpen(false);
+              }}
+              onRefreshSonos={refreshSonos}
+            />
           </div>
 
           {/* Schedule button */}
@@ -120,7 +168,7 @@ export function AudioPlayer() {
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               {volume === 0 ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-3.72a.75.75 0 0 1 1.28.53v14.88a.75.75 0 0 1-1.28.53l-4.72-3.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-3.72a.75.75 0 0 1 1.28.53v14.88a.75.75 0 0 1-1.28.53l-4.72-3.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.25 8.25 4.51 8.25H6.75Z" />
               ) : (
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-3.72a.75.75 0 0 1 1.28.53v14.88a.75.75 0 0 1-1.28.53l-4.72-3.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
               )}
