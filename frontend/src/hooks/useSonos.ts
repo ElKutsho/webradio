@@ -63,9 +63,12 @@ export function useSonos() {
   const playOnSonos = useCallback(
     async (zoneName: string, streamUrl: string) => {
       try {
-        const encoded = encodeURIComponent(streamUrl);
-        await fetch(`${apiBase}/${encodeURIComponent(zoneName)}/setavtransporturi/${encoded}`);
-        await fetch(`${apiBase}/${encodeURIComponent(zoneName)}/play`);
+        // Convert http(s):// to x-rincon-mp3radio:// for Sonos radio streaming
+        const sonosUrl = streamUrl.replace(/^https?:\/\//, 'x-rincon-mp3radio://');
+        const encoded = encodeURIComponent(sonosUrl);
+        const room = encodeURIComponent(zoneName);
+        await fetch(`${apiBase}/${room}/setavtransporturi/${encoded}`);
+        await fetch(`${apiBase}/${room}/play`);
         setActiveZone(zoneName);
       } catch {
         // Failed to play on Sonos

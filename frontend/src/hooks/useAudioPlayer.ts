@@ -62,14 +62,15 @@ export function useAudioPlayer(streamUrl: string | undefined) {
     });
   }, [streamUrl, volume, audioDevices.selectedDeviceId]);
 
-  const playSonos = useCallback((zoneName: string) => {
+  const playSonos = useCallback(async (zoneName: string) => {
     if (!streamUrl) return;
 
+    // Build absolute URL from current origin (user is on LAN since Sonos is restricted to local network)
     const absoluteUrl = streamUrl.startsWith('http')
       ? streamUrl
       : `${window.location.origin}${streamUrl}`;
 
-    sonos.playOnSonos(zoneName, absoluteUrl);
+    await sonos.playOnSonos(zoneName, absoluteUrl);
     setIsPlaying(true);
     setIsBuffering(false);
   }, [streamUrl, sonos]);
