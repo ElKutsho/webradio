@@ -65,9 +65,9 @@ export function useSonos() {
       try {
         // Convert http(s):// to x-rincon-mp3radio:// for Sonos radio streaming
         const sonosUrl = streamUrl.replace(/^https?:\/\//, 'x-rincon-mp3radio://');
-        const encoded = encodeURIComponent(sonosUrl);
         const room = encodeURIComponent(zoneName);
-        await fetch(`${apiBase}/${room}/setavtransporturi/${encoded}`);
+        // Do NOT encodeURIComponent the stream URL - node-sonos-http-api expects it raw
+        await fetch(`${apiBase}/${room}/setavtransporturi/${sonosUrl}`);
         await fetch(`${apiBase}/${room}/play`);
         setActiveZone(zoneName);
       } catch {
